@@ -118,8 +118,7 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
                 resource.setNode(n);
                 renderContext.getMainResource().setNode(s.getNode(renderContext.getMainResource().getNode().getPath()));
                 request.setAttribute("expiration", "0");
-                request.setAttribute("workspace", "live");
-                request.setAttribute("currentNode", n);
+                request.setAttribute("aggregateFilter.skip", true);
             } catch (PathNotFoundException e) {
                 return "";
             }
@@ -149,8 +148,7 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
             JCRNodeWrapper n = s.getNode(resource.getNode().getPath());
             resource.setNode(n);
             renderContext.getMainResource().setNode(s.getNode(renderContext.getMainResource().getNode().getPath()));
-            request.setAttribute("workspace", "default");
-            request.setAttribute("currentNode", n);
+
         }
         return previousOut;
     }
