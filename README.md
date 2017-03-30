@@ -14,7 +14,7 @@ In order to use this module:
   
   
 Please not that this preview has some limitation:
- - for content flagged as "work in progress", renaming its system name will make it disappear from the preview mode
- - moving content flagged as "work in progress" will make it disappear from the preview mode.
+ - for content flagged as "work in progress" and previously published, renaming its system name will generate an error with the workinprogress preview mode
+ - moving content flagged as "work in progress" and previously published, will generate an error with the workinprogress preview mode
  
  
