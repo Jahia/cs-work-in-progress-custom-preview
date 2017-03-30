@@ -80,6 +80,7 @@ import org.jahia.services.render.Resource;
 import org.jahia.services.render.filter.AbstractFilter;
 import org.jahia.services.render.filter.RenderChain;
 
+import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
@@ -87,6 +88,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * Filer that displays live version of 'work in progress' content in preview
@@ -95,6 +97,13 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
 
     public static final String PREVIEW_MODE = "previewmode";
     public static final String WORK_IN_PROGRESS = "wip";
+    private static final String CACHE_TAG_START_1_NOSRC = "<!-- cache:include";
+    private static final String CACHE_TAG_START_1 = CACHE_TAG_START_1_NOSRC + " src=\"";
+    private static final String CACHE_TAG_START_2 = "\" -->\n";
+    private static final String CACHE_TAG_END = "\n<!-- /cache:include -->";
+    protected static final Pattern CLEANUP_REGEXP = Pattern.compile(CACHE_TAG_START_1 + "(.*)" + CACHE_TAG_START_2 + "|" + CACHE_TAG_END);
+
+
     @Override
     public String prepare(RenderContext renderContext, Resource resource, RenderChain chain) throws Exception {
         final HttpServletRequest request = renderContext.getRequest();
@@ -106,13 +115,19 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
         List<String> wipNodes = (List<String>) request.getAttribute("WIP_nodes");
         if (StringUtils.equals(resource.getWorkspace(), "default") && isWorkInProgress(resource.getNode(), wipNodes)) {
             JCRSessionWrapper s = JCRSessionFactory.getInstance().getCurrentUserSession("live", resource.getNode().getSession().getLocale(), resource.getNode().getSession().getFallbackLocale());
+            JCRNodeWrapper n;
             try {
-                JCRNodeWrapper n = s.getNode(resource.getNode().getPath());
+                if (s.nodeExists(resource.getNode().getPath())){
+                    n = s.getNode(resource.getNode().getPath());
+                }else{
+                    n = s.getNodeByIdentifier(resource.getNode().getIdentifier());
+                }
+
                 chain.pushAttribute(request, "WIP_" + resource.toString(), true);
                 if (wipNodes == null) {
                     wipNodes = new ArrayList<String>();
                 }
-                wipNodes.add(resource.getNode().getPath());
+                wipNodes.add(n.getPath());
                 chain.pushAttribute(request, "WIP_nodes", wipNodes);
                 renderContext.setWorkspace("live");
                 resource.setNode(n);
@@ -121,9 +136,14 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
                 request.setAttribute("aggregateFilter.skip", true);
             } catch (PathNotFoundException e) {
                 return "";
+            }catch (ItemNotFoundException e) {
+                return "";
+            }catch (RepositoryException e) {
+                return "";
             }
         }
         return null;
+
     }
 
     @Override
@@ -145,12 +165,28 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
                 }
             }
             JCRSessionWrapper s = JCRSessionFactory.getInstance().getCurrentUserSession("default", resource.getNode().getSession().getLocale(), resource.getNode().getSession().getFallbackLocale());
-            JCRNodeWrapper n = s.getNode(resource.getNode().getPath());
+            JCRNodeWrapper n;
+
+            if (s.nodeExists(resource.getNode().getPath())){
+                n = s.getNode(resource.getNode().getPath());
+            }else{
+                n = s.getNodeByIdentifier(resource.getNode().getIdentifier());
+            }
+
             resource.setNode(n);
             renderContext.getMainResource().setNode(s.getNode(renderContext.getMainResource().getNode().getPath()));
 
         }
-        return previousOut;
+        String out = removeCacheTags(previousOut);
+        return out;
+    }
+
+    public static String removeCacheTags(String content) {
+        if (StringUtils.isNotEmpty(content)) {
+            return CLEANUP_REGEXP.matcher(content).replaceAll(StringUtils.EMPTY);
+        } else {
+            return content;
+        }
     }
 
     private boolean isWorkInProgress(JCRNodeWrapper node, List<String> wipNodes) throws RepositoryException {
