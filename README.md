@@ -1,5 +1,5 @@
 # cs-work-in-progress-custom-preview
-The module is an attempt to create a preview mode that incorporate the "work in progress" status
+The module is an attempt to create a preview mode that does not show the content in "work in progress" status in the preview mode
 
 The custom edit mode configuration will add a new mode called "Advanced Preview (WIP)". This mode is based on the regular preview with an additional HTML filter.
 In preview, this filter will display the live version of piece of content flagged as 'work in progress'.
@@ -7,8 +7,9 @@ In preview, this filter will display the live version of piece of content flagge
 Note that this filter is activated when the parameter "previewmode=wip" is provided to the URL.
 
 In order to use this module:
+ - stop your Jahia instance
  - copy the custom edit mode configuration (applicationcontext-customeditmode.xml) into your DX configuration folder (digital-factory-config/jahia/)
- - in order for the module to work, you will need to deactivate the cache filter. In order to do so go to /modules/tools/renderFilters.jsp and deactivate the AggregateCacheFilter
+ - start your Jahia instance
  - deploy the module on your DX instance.
   
   
