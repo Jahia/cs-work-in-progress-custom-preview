@@ -12,9 +12,5 @@ In order to use this module:
  - start your Jahia instance
  - deploy the module on your DX instance.
   
-  
-Please not that this preview has some limitation:
- - for content flagged as "work in progress", renaming its system name will make it disappear from the preview mode
- - moving content flagged as "work in progress" will make it disappear from the preview mode.
  
  
