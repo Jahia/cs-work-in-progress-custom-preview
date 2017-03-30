@@ -115,13 +115,8 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
         List<String> wipNodes = (List<String>) request.getAttribute("WIP_nodes");
         if (StringUtils.equals(resource.getWorkspace(), "default") && isWorkInProgress(resource.getNode(), wipNodes)) {
             JCRSessionWrapper s = JCRSessionFactory.getInstance().getCurrentUserSession("live", resource.getNode().getSession().getLocale(), resource.getNode().getSession().getFallbackLocale());
-            JCRNodeWrapper n;
             try {
-                if (s.nodeExists(resource.getNode().getPath())){
-                    n = s.getNode(resource.getNode().getPath());
-                }else{
-                    n = s.getNodeByIdentifier(resource.getNode().getIdentifier());
-                }
+                JCRNodeWrapper n = s.getNode(resource.getNode().getPath());
 
                 chain.pushAttribute(request, "WIP_" + resource.toString(), true);
                 if (wipNodes == null) {
@@ -165,13 +160,8 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
                 }
             }
             JCRSessionWrapper s = JCRSessionFactory.getInstance().getCurrentUserSession("default", resource.getNode().getSession().getLocale(), resource.getNode().getSession().getFallbackLocale());
-            JCRNodeWrapper n;
 
-            if (s.nodeExists(resource.getNode().getPath())){
-                n = s.getNode(resource.getNode().getPath());
-            }else{
-                n = s.getNodeByIdentifier(resource.getNode().getIdentifier());
-            }
+            JCRNodeWrapper n = s.getNode(resource.getNode().getPath());
 
             resource.setNode(n);
             renderContext.getMainResource().setNode(s.getNode(renderContext.getMainResource().getNode().getPath()));
