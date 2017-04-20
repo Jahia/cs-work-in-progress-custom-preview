@@ -42,8 +42,8 @@
                             <property name="items">
                                 <list>
                                     <ref bean="Toolbar.Item.Live"/>
-                                    <ref bean="Toolbar.Item.Preview"/>
                                     <ref bean="Toolbar.Item.AdvancedPreview"/>
+                                    <ref bean="Toolbar.Item.Preview"/>
                                     <ref bean="Toolbar.Item.Contribute"/>
                                     <ref bean="Toolbar.Item.Studio"/>
                                     <ref bean="Toolbar.Item.Admin"/>
@@ -1111,7 +1111,7 @@
         <property name="actionItem">
             <bean class="org.jahia.ajax.gwt.client.widget.toolbar.action.SwitchModeActionItem"/>
         </property>
-        <property name="title" value="Advanced Preview (WIP)"/>
+        <property name="title" value="Aperçu avant publication"/>
         <property name="icon" value="preview"/>
         <property name="properties">
             <list>
