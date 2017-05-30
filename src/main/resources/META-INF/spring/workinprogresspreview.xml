@@ -5,7 +5,7 @@
    <property name="priority" value="10" />
    <property name="description" value="Displays live version of 'work in progress' content in preview"/>
   <property name="applyOnNodeTypes" value="jmix:lastPublished" />
-   <property name="applyOnModes" value="preview,live"/>
+   <property name="applyOnModes" value="preview"/>
  <property name="applyOnConfigurations" value="page,wrappedcontent,module" />
 </bean>
 </beans>
