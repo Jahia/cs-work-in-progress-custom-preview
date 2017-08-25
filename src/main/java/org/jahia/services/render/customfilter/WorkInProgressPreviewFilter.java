@@ -113,7 +113,7 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
         }
 
         List<String> wipNodes = (List<String>) request.getAttribute("WIP_nodes");
-        if (StringUtils.equals(resource.getWorkspace(), "default") && isWorkInProgress(resource.getNode(), wipNodes)) {
+        if (StringUtils.equals(resource.getWorkspace(), "default") && isWorkInProgress(resource.getNode(), wipNodes) && isPublished(resource.getNode())) {
             JCRSessionWrapper s = JCRSessionFactory.getInstance().getCurrentUserSession("live", resource.getNode().getSession().getLocale(), resource.getNode().getSession().getFallbackLocale());
             try {
                 JCRNodeWrapper n = s.getNode(resource.getNode().getPath());
@@ -186,10 +186,22 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
         Locale locale = node.getSession().getLocale();
         if (node.hasI18N(locale)) {
             final Node i18n = node.getI18N(locale);
-            if (i18n.hasProperty("j:workInProgress")){
-                return i18n.getProperty("j:workInProgress").getBoolean();
+            if (i18n.hasProperty("j:workInProgress") && i18n.hasProperty("j:published")){
+                return (i18n.getProperty("j:workInProgress").getBoolean() && i18n.getProperty("j:published").getBoolean());
             }
         }
-        return node.hasProperty("j:workInProgress") && node.getProperty("j:workInProgress").getBoolean();
+        return node.hasProperty("j:workInProgress") && node.getProperty("j:workInProgress").getBoolean()
+                & node.hasProperty("j:published") && node.getProperty("j:published").getBoolean();
+    }
+
+    private boolean isPublished(JCRNodeWrapper node) throws RepositoryException {
+        Locale locale = node.getSession().getLocale();
+        if (node.hasI18N(locale)) {
+            final Node i18n = node.getI18N(locale);
+            if (i18n.hasProperty("j:published")){
+                return (i18n.getProperty("j:published").getBoolean());
+            }
+        }
+        return node.hasProperty("j:published") && node.getProperty("j:published").getBoolean();
     }
 }
