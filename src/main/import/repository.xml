@@ -7,45 +7,6 @@
                              j:title="workinprogresspreview"
                              jcr:mixinTypes="jmix:hasExternalProviderExtension"
                              jcr:primaryType="jnt:module">
-                <sources jcr:mixinTypes="jmix:hasExternalProviderExtension"
-                  jcr:primaryType="jnt:moduleVersionFolder"
-                  j:staticMountPointProviderKey="module-workinprogresspreview-1.0-SNAPSHOT">
-                    <src jcr:mixinTypes="jmix:hasExternalProviderExtension"
-                 jcr:primaryType="jnt:folder">
-                        <main jcr:mixinTypes="jmix:hasExternalProviderExtension"
-                     jcr:primaryType="jnt:folder">
-                            <java jcr:mixinTypes="jmix:hasExternalProviderExtension"
-                        jcr:primaryType="jnt:javaPackageFolder">
-                                <org jcr:mixinTypes="jmix:hasExternalProviderExtension"
-                          jcr:primaryType="jnt:javaPackageFolder">
-                                    <jahia jcr:mixinTypes="jmix:hasExternalProviderExtension"
-                               jcr:primaryType="jnt:folder">
-                                        <services jcr:mixinTypes="jmix:hasExternalProviderExtension"
-                                     jcr:primaryType="jnt:javaPackageFolder">
-                                            <render jcr:mixinTypes="jmix:hasExternalProviderExtension"
-                                      jcr:primaryType="jnt:javaPackageFolder">
-                                                <customfilter jcr:mixinTypes="jmix:hasExternalProviderExtension"
-                                               jcr:primaryType="jnt:javaPackageFolder">
-                                                    <WorkInProgressPreviewFilter.java jcr:primaryType="jnt:javaSourceFile"/>
-                                                </customfilter>
-                                            </render>
-                                        </services>
-                                    </jahia>
-                                </org>
-                            </java>
-                            <resources jcr:mixinTypes="jmix:hasExternalProviderExtension"
-                             jcr:primaryType="jnt:folder">
-                                <META-INF jcr:mixinTypes="jmix:hasExternalProviderExtension"
-                               jcr:primaryType="jnt:metaInfFolder">
-                                    <spring jcr:mixinTypes="jmix:hasExternalProviderExtension"
-                                jcr:primaryType="jnt:folder">
-                                        <workinprogresspreview.xml jcr:primaryType="jnt:xmlFile"/>
-                                    </spring>
-                                </META-INF>
-                            </resources>
-                        </main>
-                    </src>
-                </sources>
                 
                 <portlets jcr:primaryType="jnt:portletFolder"/>
                 <files jcr:primaryType="jnt:folder"/>

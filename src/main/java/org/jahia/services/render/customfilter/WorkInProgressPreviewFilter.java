@@ -113,22 +113,28 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
         }
 
         List<String> wipNodes = (List<String>) request.getAttribute("WIP_nodes");
-        if (StringUtils.equals(resource.getWorkspace(), "default") && isWorkInProgress(resource.getNode(), wipNodes) && isPublished(resource.getNode())) {
+        if (StringUtils.equals(resource.getWorkspace(), "default") && isWorkInProgress(resource.getNode(), wipNodes)) {
             JCRSessionWrapper s = JCRSessionFactory.getInstance().getCurrentUserSession("live", resource.getNode().getSession().getLocale(), resource.getNode().getSession().getFallbackLocale());
             try {
                 JCRNodeWrapper n = s.getNode(resource.getNode().getPath());
 
-                chain.pushAttribute(request, "WIP_" + resource.toString(), true);
-                if (wipNodes == null) {
-                    wipNodes = new ArrayList<String>();
+
+                    chain.pushAttribute(request, "WIP_" + resource.toString(), true);
+                    if (wipNodes == null) {
+                        wipNodes = new ArrayList<String>();
+                    }
+                    wipNodes.add(n.getPath());
+                    chain.pushAttribute(request, "WIP_nodes", wipNodes);
+
+                if (isPublished(resource.getNode()) && isPublished(renderContext.getMainResource().getNode())) { // The node exists in live mode. We'll grab this version
+                    resource.setNode(n);
+                    renderContext.getMainResource().setNode(s.getNode(renderContext.getMainResource().getNode().getPath()));
+                    request.setAttribute("expiration", "0");
+                    request.setAttribute("aggregateFilter.skip", true);
+
+                } else { // This node is in WIP mode without any published version. We don't want to display it.
+                    return "";
                 }
-                wipNodes.add(n.getPath());
-                chain.pushAttribute(request, "WIP_nodes", wipNodes);
-                renderContext.setWorkspace("live");
-                resource.setNode(n);
-                renderContext.getMainResource().setNode(s.getNode(renderContext.getMainResource().getNode().getPath()));
-                request.setAttribute("expiration", "0");
-                request.setAttribute("aggregateFilter.skip", true);
             } catch (PathNotFoundException e) {
                 return "";
             }catch (ItemNotFoundException e) {
@@ -146,7 +152,11 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
         final HttpServletRequest request = renderContext.getRequest();
         String attrName = "WIP_" + resource.toString();
         Boolean wipResource = (Boolean) request.getAttribute(attrName);
+
         if (wipResource != null) {
+//            if (!isPublished(resource.getNode())) {
+//                return "";
+//            }
             request.removeAttribute(attrName);
             renderContext.setWorkspace("default");
             List<String> wipNodes = (List<String>) request.getAttribute("WIP_nodes");
@@ -165,10 +175,11 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
 
             resource.setNode(n);
             renderContext.getMainResource().setNode(s.getNode(renderContext.getMainResource().getNode().getPath()));
+            String out = removeCacheTags(previousOut);
+            return out;
 
         }
-        String out = removeCacheTags(previousOut);
-        return out;
+        return previousOut;
     }
 
     public static String removeCacheTags(String content) {
@@ -186,12 +197,11 @@ public class WorkInProgressPreviewFilter extends AbstractFilter {
         Locale locale = node.getSession().getLocale();
         if (node.hasI18N(locale)) {
             final Node i18n = node.getI18N(locale);
-            if (i18n.hasProperty("j:workInProgress") && i18n.hasProperty("j:published")){
-                return (i18n.getProperty("j:workInProgress").getBoolean() && i18n.getProperty("j:published").getBoolean());
+            if (i18n.hasProperty("j:workInProgress")){
+                return (i18n.getProperty("j:workInProgress").getBoolean());
             }
         }
-        return node.hasProperty("j:workInProgress") && node.getProperty("j:workInProgress").getBoolean()
-                & node.hasProperty("j:published") && node.getProperty("j:published").getBoolean();
+        return node.hasProperty("j:workInProgress") && node.getProperty("j:workInProgress").getBoolean();
     }
 
     private boolean isPublished(JCRNodeWrapper node) throws RepositoryException {
